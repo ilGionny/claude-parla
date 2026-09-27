@@ -1,0 +1,64 @@
+#!/bin/bash
+# claude-parla: legge ad alta voce un testo con una voce locale (Kokoro, via mlx-audio).
+# Uso:  parla "testo"   oppure   parla <<'FINE' ... FINE
+# https://github.com/ilGionny/claude-parla
+
+# Manopole: si cambiano con le variabili d'ambiente, senza toccare il file.
+VOCE="${PARLA_VOCE:-if_sara}"          # voci italiane di Kokoro: if_sara, im_nicola
+VELOCITA="${PARLA_VELOCITA:-1.0}"      # 1.2 = più svelta, 0.9 = più calma
+MOTORE="$HOME/.local/share/claude-parla/venv/bin/mlx_audio.tts.generate"
+MODELLO="mlx-community/Kokoro-82M-bf16"
+LUCCHETTO="/tmp/parla-$(id -u).lock"   # uno per utente, condiviso da tutte le tab
+
+errore() { echo "parla: $*" >&2; exit 1; }
+
+if [ $# -gt 0 ]; then
+  testo="$*"
+elif [ ! -t 0 ]; then
+  testo="$(cat)"
+else
+  errore "uso: parla \"testo\"   oppure   parla <<'FINE' ... FINE"
+fi
+[ -n "${testo//[[:space:]]/}" ] || errore "nessun testo da leggere"
+[ -x "$MOTORE" ] || errore "motore voce non trovato: lancia install.sh"
+
+dir="$(mktemp -d)" || errore "impossibile creare una cartella temporanea"
+trap 'rm -rf "$dir"' EXIT
+
+# Ogni fase gira in sottofondo con `wait`: Bash rimanda i trap finché un comando in primo
+# piano non finisce, così invece Esc (INT/TERM) ferma subito questa richiesta e solo lei.
+figlio=""
+ferma() {
+  if [ -n "$figlio" ]; then
+    kill "$figlio" 2>/dev/null
+    wait "$figlio" 2>/dev/null   # nessun audio deve partire dopo che il lucchetto è libero
+  fi
+  exit 130
+}
+trap ferma INT TERM
+
+# 1. Genera l'audio.
+printf '%s\n' "$testo" > "$dir/testo"
+"$MOTORE" --model "$MODELLO" --voice "$VOCE" --lang_code "${VOCE:0:1}" --speed "$VELOCITA" \
+  --output_path "$dir" --file_prefix voce --join_audio < "$dir/testo" > "$dir/log" 2>&1 &
+figlio=$!; wait "$figlio"; figlio=""
+
+# mlx-audio esce con 0 anche quando fallisce: conta solo il file prodotto.
+# Kokoro taglia in silenzio i blocchi oltre 510 fonemi: meglio nessun audio che un audio a metà.
+if grep -q "Truncating" "$dir/log"; then
+  errore "frase troppo lunga: dividi il testo in frasi più corte"
+fi
+if [ ! -s "$dir/voce.wav" ]; then
+  tail -n 20 "$dir/log" >&2
+  errore "la voce non è stata generata"
+fi
+
+# 2. Aspetta il proprio turno: una sola voce alla volta fra tutte le tab.
+#    Il lucchetto resta a questo processo finché vive (uso descritto in `man lockf`).
+exec 9>"$LUCCHETTO" || errore "impossibile aprire $LUCCHETTO"
+lockf -s 9 &
+figlio=$!; wait "$figlio" || errore "impossibile prendere il turno"; figlio=""
+
+# 3. Riproduci. 9>&- : afplay non si porta dietro il lucchetto.
+afplay "$dir/voce.wav" 9>&- &
+figlio=$!; wait "$figlio"
