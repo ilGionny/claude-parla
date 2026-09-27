@@ -20,7 +20,9 @@
 
 ### Aperto
 - [ ] Prova di Gionata in una sua sessione vera, con Esc premuto davvero.
-- [ ] Revisione finale di Codex sul ramo, poi merge e pubblicazione su GitHub.
+- [x] Revisione finale di Codex sul ramo: 4 rilievi, tutti corretti (parola di chiusura del testo più rara,
+      lucchetto nella cartella privata dell'utente, controllo delle cartelle prima di installare, prova più severa).
+- [ ] Merge in main e pubblicazione su GitHub, con OK di Gionata.
 
 ## Dopo (se serve)
 - `/parliamo`: conversazione a voce, con VoiceMode.

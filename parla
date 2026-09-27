@@ -1,6 +1,6 @@
 #!/bin/bash
 # claude-parla: legge ad alta voce un testo con una voce locale (Kokoro, via mlx-audio).
-# Uso:  parla "testo"   oppure   parla <<'FINE' ... FINE
+# Uso:  parla "testo"   oppure   parla <<'FINE_PARLA' ... FINE_PARLA
 # https://github.com/ilGionny/claude-parla
 
 # Manopole: si cambiano con le variabili d'ambiente, senza toccare il file.
@@ -8,7 +8,9 @@ VOCE="${PARLA_VOCE:-if_sara}"          # voci italiane di Kokoro: if_sara, im_ni
 VELOCITA="${PARLA_VELOCITA:-1.0}"      # 1.2 = più svelta, 0.9 = più calma
 MOTORE="$HOME/.local/share/claude-parla/venv/bin/mlx_audio.tts.generate"
 MODELLO="mlx-community/Kokoro-82M-bf16"
-LUCCHETTO="/tmp/parla-$(id -u).lock"   # uno per utente, condiviso da tutte le tab
+# Cartella temporanea privata dell'utente (permessi 700), la stessa per tutte le tab
+# anche se una sessione cambia $TMPDIR.
+LUCCHETTO="$(getconf DARWIN_USER_TEMP_DIR)parla.lock"
 
 errore() { echo "parla: $*" >&2; exit 1; }
 
@@ -17,7 +19,7 @@ if [ $# -gt 0 ]; then
 elif [ ! -t 0 ]; then
   testo="$(cat)"
 else
-  errore "uso: parla \"testo\"   oppure   parla <<'FINE' ... FINE"
+  errore "uso: parla \"testo\"   oppure   parla <<'FINE_PARLA' ... FINE_PARLA"
 fi
 [ -n "${testo//[[:space:]]/}" ] || errore "nessun testo da leggere"
 [ -x "$MOTORE" ] || errore "motore voce non trovato: lancia install.sh"
@@ -55,7 +57,7 @@ fi
 
 # 2. Aspetta il proprio turno: una sola voce alla volta fra tutte le tab.
 #    Il lucchetto resta a questo processo finché vive (uso descritto in `man lockf`).
-exec 9>"$LUCCHETTO" || errore "impossibile aprire $LUCCHETTO"
+exec 9>>"$LUCCHETTO" || errore "impossibile aprire $LUCCHETTO"   # >> : non svuota mai niente
 lockf -s 9 &
 figlio=$!; wait "$figlio" || errore "impossibile prendere il turno"; figlio=""
 

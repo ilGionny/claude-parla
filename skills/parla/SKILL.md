@@ -25,10 +25,12 @@ Come scrivere il riassunto:
 Poi esegui, con il riassunto al posto dei puntini:
 
 ```bash
-parla <<'FINE'
+parla <<'FINE_PARLA'
 ...
-FINE
+FINE_PARLA
 ```
+
+Il riassunto non deve contenere una riga fatta solo di `FINE_PARLA`: chiuderebbe il testo in anticipo.
 
 Dopo il comando, al massimo una riga brevissima: il riassunto l'utente l'ha già sentito.
 Se `parla` risponde "frase troppo lunga", riscrivi il riassunto con frasi più corte e riprova una sola volta.

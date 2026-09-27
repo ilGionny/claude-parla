@@ -27,23 +27,23 @@ Una domanda vera a Claude Code, poi `/parla`:
 > Come si prepara un buon caffè con la moka? Dammi i passaggi con le dosi,
   e dimmi se conviene pressare il caffè nel filtro.
 
-  (Claude risponde: una tabella di dosi, sei passaggi, quattro motivi per non pressare)
+  (Claude risponde: sette passaggi, una tabella di dosi, tre motivi per non pressare,
+   come pulirla. Quasi quattrocento parole.)
 
 > /parla
 
-  Bash  parla <<'FINE'
-        Caffè con la moka. Non si pressa: il caffè nel filtro va messo fino all'orlo
-        e livellato, senza montagnetta. L'acqua va fino a poco sotto la valvola, meglio
-        se già calda, e la moka da tre tazze vuole circa quindici grammi. Fuoco medio
-        basso, e quando il caffè diventa color miele e gorgoglia si toglie subito.
-        Pressato fa da tappo, perché la moka spinge a solo uno o due bar, e il caffè
-        esce amaro.
-        FINE
+  Bash  parla <<'FINE_PARLA'
+        Caffè con la moka. Il filtro non si pressa: si riempie fino all'orlo e si
+        livella, altrimenti il caffè esce amaro e può scattare la valvola. Acqua nella
+        caldaia fino a poco sotto la valvola, meglio se già calda. Per una moka da tre
+        tazze servono circa centocinquanta millilitri d'acqua e quindici o sedici
+        grammi di caffè. Fuoco basso, togli al primo gorgoglio e mescola prima di versare.
+        FINE_PARLA
 ```
 
 [▶ Ascolta come suona (20 secondi, voce Sara)](assets/esempio.mp3)
 
-Settantacinque parole al posto di una pagina. Il «non si pressa» e gli uno o due bar restano esatti; i 14-16 grammi diventano «circa quindici», perché arrotondare lì non cambia niente.
+Sessantotto parole al posto di quasi quattrocento. Il «non si pressa», i 150 millilitri e i 15-16 grammi della tabella restano esatti.
 
 ## Avvio rapido
 

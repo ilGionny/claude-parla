@@ -56,7 +56,11 @@ t_stop_durante_attesa_turno() {
   "$P" "Prova tre. Io parlo fino alla fine, anche se l'altra richiesta viene fermata mentre aspetta." & a=$!
   aspetta_voce "$a" || return 1
   "$P" "Questa frase non deve mai essere pronunciata." & b=$!
-  for _ in $(seq 100); do pgrep -P "$b" -x lockf >/dev/null && break; sleep 0.1; done
+  local in_attesa=0
+  for _ in $(seq 150); do pgrep -P "$b" -x lockf >/dev/null && { in_attesa=1; break; }; sleep 0.1; done
+  if [ "$in_attesa" -eq 0 ]; then   # non ha mai raggiunto l'attesa del turno: la prova non vale
+    kill -TERM "$b" 2>/dev/null; wait "$b"; wait "$a"; return 1
+  fi
   kill -TERM "$b"; wait "$b"; rc=$?
   [ "$rc" -eq 130 ] && [ "$(voci_di "$a")" -eq 1 ] && wait "$a" && nessuna_voce
 }

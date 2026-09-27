@@ -26,12 +26,16 @@ nostro() { [ ! -e "$1" ] || grep -q "$FIRMA" "$1"; }
 nostro "$BIN/parla" || ferma "esiste già $BIN/parla e non è di $FIRMA: non lo tocco"
 nostro "$SKILL/SKILL.md" || ferma "esiste già la skill $SKILL e non è di $FIRMA: non la tocco"
 
+# Prima di toccare qualsiasi cosa: le destinazioni devono essere scrivibili.
+for d in "$(dirname "$VENV")" "$BIN" "$SKILL"; do
+  mkdir -p "$d" 2>/dev/null && [ -w "$d" ] || ferma "non posso scrivere in $d"
+done
+
 echo "Installo il motore voce in $VENV ..."
 [ -x "$VENV/bin/python" ] || uv venv -q --python 3.12 "$VENV"
 uv pip install -q --python "$VENV/bin/python" -r "$QUI/requirements.txt"
 ok "motore voce (mlx-audio + Kokoro), versioni collaudate"
 
-mkdir -p "$BIN" "$SKILL"
 install -m 755 "$QUI/parla" "$BIN/parla"
 install -m 644 "$QUI/skills/parla/SKILL.md" "$SKILL/SKILL.md"
 ok "comando parla in $BIN"
