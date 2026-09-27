@@ -165,7 +165,7 @@ MIT. Vedi [LICENSE](LICENSE).
 
 ## Chi l'ha fatto
 
-[Gionata Capasso](https://github.com/ilGionny).
+Gionata Capasso. Scrivimi su [LinkedIn](https://www.linkedin.com/in/gionata-capasso-b452ab18a/) se lo usi, se si rompe o se hai un'idea.
 
 ---
 

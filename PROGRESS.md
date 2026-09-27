@@ -19,10 +19,10 @@
 - Dopo il comando, Claude aggiunge quasi sempre una riga di conferma: la regola ora la ammette.
 
 ### Aperto
-- [ ] Prova di Gionata in una sua sessione vera, con Esc premuto davvero.
+- [x] Prova di Gionata in una sua sessione vera: «sembra ok».
 - [x] Revisione finale di Codex sul ramo: 4 rilievi, tutti corretti (parola di chiusura del testo più rara,
       lucchetto nella cartella privata dell'utente, controllo delle cartelle prima di installare, prova più severa).
-- [ ] Merge in main e pubblicazione su GitHub, con OK di Gionata.
+- [x] Merge in main e pubblicazione su GitHub, con OK di Gionata.
 
 ## Dopo (se serve)
 - `/parliamo`: conversazione a voce, con VoiceMode.
